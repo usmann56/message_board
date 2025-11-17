@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../components/app_drawer.dart';
+import 'chat_screen.dart';
 
 class RoomSection extends StatelessWidget {
   final String title;
@@ -65,26 +66,75 @@ class MainRoomScreen extends StatelessWidget {
 
       body: ListView(
         padding: EdgeInsets.zero,
-        children: const [
-          RoomSection(
-            title: 'Games',
-            backgroundColor: Color(0xFFFF5733),
-            assetPath: 'assets/gammer.avif',
+        children: [
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      ChatScreen(boardName: 'Games', boardId: 'games'),
+                ),
+              );
+            },
+            child: RoomSection(
+              title: 'Games',
+              backgroundColor: Color(0xFFFF5733),
+              assetPath: 'assets/gammer.avif',
+            ),
           ),
-          RoomSection(
-            title: 'Business',
-            backgroundColor: Color(0xFF6A994E),
-            assetPath: 'assets/business.avif',
+
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      ChatScreen(boardName: 'Business', boardId: 'business'),
+                ),
+              );
+            },
+            child: RoomSection(
+              title: 'Business',
+              backgroundColor: Color(0xFF6A994E),
+              assetPath: 'assets/business.avif',
+            ),
           ),
-          RoomSection(
-            title: 'Public Health',
-            backgroundColor: Color(0xFF4C8CD2),
-            assetPath: 'assets/public_health.jpg',
+
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ChatScreen(
+                    boardName: 'Public Health',
+                    boardId: 'publicHealth',
+                  ),
+                ),
+              );
+            },
+            child: RoomSection(
+              title: 'Public Health',
+              backgroundColor: Color(0xFF4C8CD2),
+              assetPath: 'assets/public_health.jpg',
+            ),
           ),
-          RoomSection(
-            title: 'Study',
-            backgroundColor: Color(0xFF7B3F9F),
-            assetPath: 'assets/study.jpeg',
+
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      ChatScreen(boardName: 'Study', boardId: 'study'),
+                ),
+              );
+            },
+            child: RoomSection(
+              title: 'Study',
+              backgroundColor: Color(0xFF7B3F9F),
+              assetPath: 'assets/study.jpeg',
+            ),
           ),
         ],
       ),
