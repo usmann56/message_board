@@ -16,14 +16,14 @@ class AppDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: const BoxDecoration(color: Colors.blue),
+            decoration: const BoxDecoration(color: Colors.purple),
             child: Text(
               "Menu",
               style: TextStyle(color: Colors.white, fontSize: 24),
             ),
           ),
 
-          // ⭐ Message Boards → Home page
+          // Message Boards → Home page
           ListTile(
             leading: Icon(Icons.forum),
             title: const Text("Message Boards"),
@@ -36,7 +36,7 @@ class AppDrawer extends StatelessWidget {
             },
           ),
 
-          // ⭐ Profile page
+          // Profile page
           ListTile(
             leading: Icon(Icons.person),
             title: const Text("Profile"),
@@ -49,7 +49,7 @@ class AppDrawer extends StatelessWidget {
             },
           ),
 
-          // ⭐ Settings page
+          // Settings page
           ListTile(
             leading: Icon(Icons.settings),
             title: const Text("Settings"),

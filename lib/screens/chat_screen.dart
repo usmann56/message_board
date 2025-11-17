@@ -14,14 +14,21 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final _messageController = TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
   final _auth = FirebaseAuth.instance;
 
   void _sendMessage() async {
     if (_messageController.text.trim().isEmpty) return;
 
     final user = _auth.currentUser!;
-    final userName = user.displayName ?? user.email ?? "Anonymous";
+    final uid = user.uid;
+
+    final userDoc = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get();
+
+    final userName = userDoc.data()?['firstName'] ?? "Unknown";
 
     await FirebaseFirestore.instance
         .collection('messageBoards')
@@ -37,85 +44,159 @@ class _ChatScreenState extends State<ChatScreen> {
     _messageController.clear();
   }
 
+  String formatDate(DateTime date) {
+    final now = DateTime.now();
+
+    if (date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day) {
+      return "Today";
+    }
+
+    final yesterday = now.subtract(Duration(days: 1));
+    if (date.year == yesterday.year &&
+        date.month == yesterday.month &&
+        date.day == yesterday.day) {
+      return "Yesterday";
+    }
+
+    return DateFormat("MMM dd").format(date);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(widget.boardName)),
       body: Column(
         children: [
-          // Messages List
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('messageBoards')
                   .doc(widget.boardId)
                   .collection('messages')
-                  .orderBy('timestamp', descending: true)
+                  .orderBy('timestamp')
                   .snapshots(),
               builder: (context, snapshot) {
-                if (!snapshot.hasData) {
+                if (!snapshot.hasData)
                   return Center(child: CircularProgressIndicator());
-                }
 
                 final messages = snapshot.data!.docs;
 
                 return ListView.builder(
-                  reverse: true,
+                  padding: EdgeInsets.all(12),
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final msg = messages[index];
                     final isMe = msg['senderId'] == _auth.currentUser!.uid;
 
-                    return Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      alignment: isMe
-                          ? Alignment.centerRight
-                          : Alignment.centerLeft,
-                      child: Column(
-                        crossAxisAlignment: isMe
-                            ? CrossAxisAlignment.end
-                            : CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            msg['senderName'] ?? 'Unknown',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Container(
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: isMe
-                                  ? Colors.blueAccent
-                                  : Colors.grey.shade300,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                    Timestamp? ts = msg['timestamp'];
+                    DateTime messageTime = (ts != null)
+                        ? ts.toDate().toLocal()
+                        : DateTime.now();
+
+                    bool showDateHeader = false;
+                    if (index == 0) {
+                      showDateHeader = true;
+                    } else {
+                      Timestamp? prevTs = messages[index - 1]['timestamp'];
+                      DateTime prevDate = (prevTs != null)
+                          ? prevTs.toDate().toLocal()
+                          : DateTime.now();
+
+                      if (prevDate.day != messageTime.day ||
+                          prevDate.month != messageTime.month ||
+                          prevDate.year != messageTime.year) {
+                        showDateHeader = true;
+                      }
+                    }
+
+                    bool showSenderName = false;
+                    if (!isMe) {
+                      if (index == 0) {
+                        showSenderName = true;
+                      } else {
+                        final prevMsg = messages[index - 1];
+                        if (prevMsg['senderId'] != msg['senderId']) {
+                          showSenderName = true;
+                        }
+                      }
+                    }
+
+                    return Column(
+                      children: [
+                        if (showDateHeader)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
                             child: Text(
-                              msg['text'],
+                              formatDate(messageTime),
                               style: TextStyle(
-                                color: isMe ? Colors.white : Colors.black,
-                                fontSize: 16,
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
-                          SizedBox(height: 2),
-                          Text(
-                            msg['timestamp'] != null
-                                ? DateFormat('HH:mm MM-dd').format(
-                                    (msg['timestamp'] as Timestamp)
-                                        .toDate()
-                                        .toLocal(),
-                                  )
-                                : '',
-                            style: TextStyle(fontSize: 10, color: Colors.grey),
+
+                        Align(
+                          alignment: isMe
+                              ? Alignment.centerRight
+                              : Alignment.centerLeft,
+                          child: Column(
+                            crossAxisAlignment: isMe
+                                ? CrossAxisAlignment.end
+                                : CrossAxisAlignment.start,
+                            children: [
+                              if (showSenderName)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 2),
+                                  child: Text(
+                                    msg['senderName'],
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey[700],
+                                    ),
+                                  ),
+                                ),
+
+                              Container(
+                                padding: EdgeInsets.all(10),
+                                margin: EdgeInsets.symmetric(vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: isMe
+                                      ? Colors.green[300]
+                                      : Colors.grey[300],
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        msg['text'],
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      DateFormat('HH:mm').format(messageTime),
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.black54,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     );
                   },
                 );
@@ -123,46 +204,35 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
 
-          // Message Input
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Row(
                 children: [
-                  // Expanded input field
                   Expanded(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      padding: EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
                         color: Colors.grey[200],
                         borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 2,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
                       ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: _messageController,
-                              decoration: InputDecoration(
-                                hintText: "Type a message...",
-                                border: InputBorder.none,
-                              ),
-                              minLines: 1,
-                              maxLines: 5,
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.send, color: Colors.blue),
-                            onPressed: _sendMessage,
-                          ),
-                        ],
+                      child: TextField(
+                        controller: _messageController,
+                        decoration: InputDecoration(
+                          hintText: "Message",
+                          border: InputBorder.none,
+                        ),
+                        minLines: 1,
+                        maxLines: 6,
                       ),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  CircleAvatar(
+                    backgroundColor: Colors.green,
+                    child: IconButton(
+                      icon: Icon(Icons.send, color: Colors.white),
+                      onPressed: _sendMessage,
                     ),
                   ),
                 ],

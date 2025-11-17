@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'message-board-87d3a.firebasestorage.app',
     measurementId: 'G-KN1QDDPK4E',
   );
+
 }

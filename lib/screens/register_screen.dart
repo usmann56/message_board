@@ -93,7 +93,6 @@ class _RegisterEmailSectionState extends State<RegisterEmailSection> {
         _message = "Successfully registered ${_emailController.text}";
       });
 
-      // Show success snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -102,7 +101,6 @@ class _RegisterEmailSectionState extends State<RegisterEmailSection> {
         ),
       );
 
-      // Wait a moment, then navigate
       Future.delayed(const Duration(milliseconds: 500), () {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => MainRoomScreen()),
