@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import './profile_screen.dart';
 import '../components/app_drawer.dart';
+import './change_password_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   SettingsScreen({super.key});
@@ -29,9 +30,13 @@ class SettingsScreen extends StatelessWidget {
             leading: Icon(Icons.lock),
             title: const Text("Change Password"),
             onTap: () {
-              // TODO
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ChangePasswordScreen()),
+              );
             },
           ),
+
           ListTile(
             leading: Icon(Icons.person),
             title: const Text("Edit Personal Info"),
