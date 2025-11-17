@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../screens/profile_screen.dart';
+import '../screens/room_selection_screen.dart';
 
 class AuthTabsScreen extends StatelessWidget {
   final FirebaseAuth auth;
@@ -88,9 +88,7 @@ class _RegisterEmailSectionState extends State<RegisterEmailSection> {
       // Wait a moment, then navigate
       Future.delayed(const Duration(milliseconds: 500), () {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => ProfileScreen(user: result.user!),
-          ),
+          MaterialPageRoute(builder: (context) => MainRoomScreen()),
         );
       });
     } on FirebaseAuthException catch (e) {
@@ -210,10 +208,8 @@ class _EmailPasswordFormState extends State<EmailPasswordForm> {
         _initialState = false;
       });
 
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => ProfileScreen(user: userCredential.user!),
-        ),
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => MainRoomScreen()),
       );
     } on FirebaseAuthException catch (e) {
       String errorMsg;
