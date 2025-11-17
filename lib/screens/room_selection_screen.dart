@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../components/app_drawer.dart';
 
 class RoomSection extends StatelessWidget {
   final String title;
@@ -58,39 +59,31 @@ class MainRoomScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Select A Room'),
-        centerTitle: false,
-        actions: const [Icon(Icons.menu), SizedBox(width: 16)],
-      ),
+      appBar: AppBar(title: const Text('Select A Room'), centerTitle: false),
+
+      drawer: AppDrawer(),
+
       body: ListView(
         padding: EdgeInsets.zero,
-        children: <Widget>[
-          // --- Games Section (Red/Orange) ---
+        children: const [
           RoomSection(
             title: 'Games',
-            backgroundColor: const Color(0xFFFF5733),
+            backgroundColor: Color(0xFFFF5733),
             assetPath: 'assets/gammer.avif',
           ),
-
-          // --- Business Section (Teal/Green) ---
           RoomSection(
             title: 'Business',
-            backgroundColor: const Color(0xFF6A994E),
+            backgroundColor: Color(0xFF6A994E),
             assetPath: 'assets/business.avif',
           ),
-
-          // --- Public Health Section (Blue/Purple) ---
           RoomSection(
             title: 'Public Health',
-            backgroundColor: const Color(0xFF4C8CD2),
+            backgroundColor: Color(0xFF4C8CD2),
             assetPath: 'assets/public_health.jpg',
           ),
-
-          // --- Study Section (Purple) ---
           RoomSection(
             title: 'Study',
-            backgroundColor: const Color(0xFF7B3F9F),
+            backgroundColor: Color(0xFF7B3F9F),
             assetPath: 'assets/study.jpeg',
           ),
         ],

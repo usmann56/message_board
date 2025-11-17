@@ -48,10 +48,26 @@ class _RegisterEmailSectionState extends State<RegisterEmailSection> {
   final TextEditingController _lastName = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final _dobController = TextEditingController();
 
   bool _success = false;
   bool _initialState = true;
   String? _message;
+
+  Future<void> _selectDOB() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2000),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _dobController.text = "${picked.year}-${picked.month}-${picked.day}";
+      });
+    }
+  }
 
   void _register() async {
     try {
@@ -60,13 +76,14 @@ class _RegisterEmailSectionState extends State<RegisterEmailSection> {
         password: _passwordController.text.trim(),
       );
 
-      // 🔥 Save additional profile info to Firestore if you want
+      // Save additional profile info to Firestore
       await FirebaseFirestore.instance
           .collection("users")
           .doc(result.user!.uid)
           .set({
             "firstName": _firstName.text.trim(),
             "lastName": _lastName.text.trim(),
+            "dob": _dobController.text,
             "email": _emailController.text.trim(),
           });
 
@@ -137,6 +154,16 @@ class _RegisterEmailSectionState extends State<RegisterEmailSection> {
                 if (value!.isEmpty) return "Please enter last name";
                 return null;
               },
+            ),
+
+            TextField(
+              controller: _dobController,
+              decoration: InputDecoration(
+                labelText: "Date of Birth",
+                suffixIcon: Icon(Icons.calendar_today),
+              ),
+              readOnly: true,
+              onTap: _selectDOB,
             ),
 
             TextFormField(

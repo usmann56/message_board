@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (user != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => ProfileScreen(user: user)),
+          MaterialPageRoute(builder: (context) => ProfileScreen()),
         );
       });
     }
