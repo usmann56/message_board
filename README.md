@@ -1,16 +1,17 @@
 # message_board
 
-A new Flutter project.
+Features Implemented
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Register
+- - required fields are firstName, lastName, eMail and Password. DOB is optional. eMail should be unique. Password should be strong.
+- Login
+- - Password validation through firestore
+- Home screen
+- - User can choose which room he want to enter
+- Individual roooms
+- - Users can chat in individial rooms. All chat history of that room is displayed there.
+- Menu option <Message board, Profile, Settings>
+- - Message Board takes to home screen
+- - In profile screen user can update profile fields like firstName, lastName or DOB
+- - In settings screen user can Change password, Edit profile or Logout.
+- - Change password checks if current password entered is correct and if new password is strong.
